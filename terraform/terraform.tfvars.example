@@ -13,7 +13,7 @@ region = "us-central1"
 service_name = "sonora-web"
 
 # Artifact Registry repository ID
-repository_id = "sonora-repo"
+repository_id = "finalrepo"
 
 # Tag for the container image
 image_tag = "latest"

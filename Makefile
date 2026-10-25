@@ -11,7 +11,7 @@ SHELL := /bin/bash
 PROJECT_ID   ?= $(shell gcloud config get-value project 2>/dev/null)
 REGION       ?= us-central1
 SERVICE_NAME ?= sonora-web
-REPO_NAME    ?= sonora-repo
+REPO_NAME    ?= finalrepo
 IMAGE_TAG    ?= latest
 PORT         ?= 3000
 

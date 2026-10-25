@@ -116,6 +116,20 @@ terraform/
 
 ## 📂 Project Structure
 
+### Customizing Configuration
+Copy `terraform/terraform.tfvars.example` to `terraform/terraform.tfvars`:
+```hcl
+project_id            = "my-gcp-project"
+region                = "us-central1"
+service_name          = "sonora-web"
+repository_id         = "finalrepo"
+cpu                   = "1"
+memory                = "512Mi"
+min_instances         = 0
+max_instances         = 5
+allow_unauthenticated = true
+```
+
 ```
 finalrepo/
 ├── Makefile                         # Cloud Shell automation & build commands

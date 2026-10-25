@@ -18,7 +18,7 @@ variable "service_name" {
 variable "repository_id" {
   description = "Name/ID of the Artifact Registry Docker repository"
   type        = string
-  default     = "sonora-repo"
+  default     = "finalrepo"
 }
 
 variable "image_tag" {
