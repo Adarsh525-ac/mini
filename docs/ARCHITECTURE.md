@@ -177,3 +177,18 @@ Each microservice container image is built and deployed independently to **Googl
 4. `cloudtune-user-service` $\rightarrow$ Cloud Run service
 5. `cloudtune-admin-service` $\rightarrow$ Cloud Run service
 - Databases: Cloud Firestore multi-database instances (`catalog-db`, `playlist-db`, `user-db`, `admin-db`).
+
+### D. Infrastructure as Code (Terraform) & Cloud Shell Automation
+All GCP cloud resources are provisioned via declarative Terraform files located in `terraform/`:
+- **APIs**: `run`, `artifactregistry`, `firestore`, `storage`, `cloudbuild`, `iam`, `identitytoolkit`
+- **Container Registry**: Artifact Registry Docker repository (`cloudtune-repo`)
+- **Media Storage**: Google Cloud Storage (`cloudtune-media-<project-id>`) with streaming CORS
+- **NoSQL Database**: Cloud Firestore Native database
+- **Least-Privilege Security**: Dedicated `cloudtune-runner` Service Account with scoped IAM roles
+- **Serverless Compute**: Google Cloud Run `cloudtune-api` with zero-to-N autoscaling
+
+Managed via root [Makefile](file:///c:/Users/adars/OneDrive/Desktop/MINCLOUD/Makefile) in Google Cloud Shell:
+```bash
+make tf-apply PROJECT_ID="<your-gcp-project-id>"
+make deploy-all PROJECT_ID="<your-gcp-project-id>"
+```

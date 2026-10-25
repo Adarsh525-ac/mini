@@ -92,7 +92,64 @@ For complete architectural diagrams and data flows, see [docs/ARCHITECTURE.md](d
 
 ---
 
-## 🛠️ Step-by-Step Google Cloud Deployment
+## ⚡ Running in Google Cloud Shell (With `make`)
+
+Google Cloud Shell comes pre-configured with `gcloud`, `terraform`, `docker`, and `node`. You can manage the entire application lifecycle using the bundled [Makefile](file:///c:/Users/adars/OneDrive/Desktop/MINCLOUD/Makefile):
+
+```bash
+# 1. Open Google Cloud Shell in your browser and clone the repository
+git clone https://github.com/Adarsh525-ac/mini.git cloudtune && cd cloudtune
+
+# 2. View all available Cloud Shell targets
+make help
+
+# 3. Check environment prerequisites and connect to your GCP project
+make check-env
+make config PROJECT_ID="<your-gcp-project-id>"
+
+# 4. Install backend and frontend dependencies
+make install
+
+# 5. Run the complete application for Cloud Shell Web Preview (Port 8080)
+make dev-cloudshell
+# Then click "Web Preview" -> "Preview on port 8080" in the Cloud Shell header!
+
+# 6. Run automated test suites
+make test
+```
+
+---
+
+## 🏗️ Google Cloud Platform IaC with Terraform
+
+CloudTune includes declarative Terraform configuration in [`terraform/`](file:///c:/Users/adars/OneDrive/Desktop/MINCLOUD/terraform) to provision all cloud infrastructure:
+
+### Resources Managed by Terraform:
+- **Google Cloud APIs**: Enables `run`, `artifactregistry`, `firestore`, `storage`, `cloudbuild`, `iam`, `identitytoolkit`
+- **Artifact Registry Repository**: `cloudtune-repo` for container images
+- **Google Cloud Storage Bucket**: `cloudtune-media-<project-id>` with CORS streaming configuration
+- **Cloud Firestore Database**: Managed native document database
+- **IAM Service Account & Roles**: Least-privilege `cloudtune-runner` service account
+- **Google Cloud Run Service**: Serverless microservices API with auto-scaling (0 to 5 instances)
+
+### One-Command Provisioning:
+```bash
+# Provision all cloud resources in minutes
+make tf-apply PROJECT_ID="<your-gcp-project-id>"
+
+# View service URLs and bucket names
+make tf-output
+
+# Full end-to-end cloud deployment: Terraform + Cloud Build + Cloud Run + Firestore Seeding
+make deploy-all PROJECT_ID="<your-gcp-project-id>"
+
+# Teardown cloud resources when demonstration is finished
+make tf-destroy PROJECT_ID="<your-gcp-project-id>"
+```
+
+---
+
+## 🛠️ Step-by-Step Google Cloud Deployment (Manual CLI)
 
 ### 1. Prerequisites
 - [Google Cloud SDK (gcloud CLI)](https://cloud.google.com/sdk/docs/install) installed and authenticated (`gcloud auth login`).
@@ -110,23 +167,18 @@ cp .env.example .env
 Update `backend/.env` with your GCP Project ID and storage bucket name.
 
 ### 3. Deploy Backend to Google Cloud Run
-Run the deployment script:
+Run the deployment script or Makefile target:
 ```bash
-# On Linux / macOS:
+# Using Makefile (Linux / Cloud Shell / macOS):
+make deploy-backend PROJECT_ID="<YOUR-GCP-PROJECT-ID>"
+
+# Using script directly (Bash):
 chmod +x ./gcp-config/deploy-backend.sh
 ./gcp-config/deploy-backend.sh <YOUR-GCP-PROJECT-ID>
 
 # On Windows PowerShell:
 .\gcp-config\deploy-backend.ps1 -ProjectId "<YOUR-GCP-PROJECT-ID>"
 ```
-
-The script will:
-1. Enable `run.googleapis.com`, `artifactregistry.googleapis.com`, `firestore.googleapis.com`, and `storage.googleapis.com`.
-2. Create an **Artifact Registry** repository.
-3. Create a **Cloud Storage** bucket with CORS policy (`gcp-config/cors.json`).
-4. Build the container image with **Cloud Build**.
-5. Deploy to **Cloud Run** with least-privilege configuration and scale-to-zero (`min-instances=0`).
-6. Output your public HTTPS service URL (e.g. `https://cloudtune-api-xxxxx-uc.a.run.app`).
 
 ### 4. Deploy Frontend to Firebase Hosting
 Update `frontend/.env` with your newly deployed Cloud Run URL:
@@ -135,13 +187,11 @@ VITE_API_URL=https://cloudtune-api-xxxxx-uc.a.run.app/api
 ```
 Deploy the frontend:
 ```bash
-cd frontend
-npm run build
-cd ..
-npx firebase-tools deploy --only hosting
+make deploy-frontend
+# or manually:
+cd frontend && npm run build && cd .. && npx firebase-tools deploy --only hosting
 ```
 
----
 
 ## 📂 Project Repository Structure
 

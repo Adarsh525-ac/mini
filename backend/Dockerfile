@@ -11,8 +11,10 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --only=production
 
-# Copy source code and upload directories
+# Copy source code, microservices, shared modules, and uploads
 COPY src/ ./src/
+COPY shared/ ./shared/
+COPY services/ ./services/
 COPY uploads/ ./uploads/
 
 # Cloud Run sets PORT environment variable (default 8080)
