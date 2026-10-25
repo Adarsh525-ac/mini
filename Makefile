@@ -29,10 +29,23 @@ BOLD   := \033[1m
 RESET  := \033[0m
 
 # ------------------------------------------------------------------------------
-# Helper validation
+# Helper validation & Automatic Cloud Shell Authentication
 # ------------------------------------------------------------------------------
+TF_AUTH = GOOGLE_OAUTH_ACCESS_TOKEN=$$(gcloud auth print-access-token 2>/dev/null)
+
+.PHONY: check-auth
+check-auth:
+	@CURRENT_ACC=$$(gcloud config get-value account 2>/dev/null); \
+	if [ -z "$$CURRENT_ACC" ] || [ "$$CURRENT_ACC" = "(unset)" ]; then \
+		DETECTED_ACC=$$(gcloud auth list --format="value(account)" 2>/dev/null | head -n 1); \
+		if [ -n "$$DETECTED_ACC" ]; then \
+			echo -e "$(CYAN)Automatically activating Cloud Shell session account: $$DETECTED_ACC$(RESET)"; \
+			gcloud config set account "$$DETECTED_ACC" --quiet 2>/dev/null; \
+		fi; \
+	fi
+
 .PHONY: check-project
-check-project:
+check-project: check-auth
 	@if [ -z "$(PROJECT_ID)" ] || [ "$(PROJECT_ID)" = "(unset)" ]; then \
 		echo -e "$(RED)$(BOLD)Error: GCP Project ID is not set.$(RESET)"; \
 		echo -e "$(YELLOW)Please set your active project with:$(RESET)"; \
@@ -86,7 +99,7 @@ help:
 # Diagnostics and Setup
 # ------------------------------------------------------------------------------
 .PHONY: doctor
-doctor:
+doctor: check-auth
 	@echo -e "\n$(BOLD)Checking Environment & Prerequisites...$(RESET)"
 	@echo -n "  • gcloud CLI:   " && (which gcloud >/dev/null 2>&1 && gcloud --version | head -n 1) || echo -e "$(RED)NOT FOUND$(RESET)"
 	@echo -n "  • Terraform:    " && (which terraform >/dev/null 2>&1 && terraform version | head -n 1) || echo -e "$(RED)NOT FOUND$(RESET)"
@@ -94,9 +107,10 @@ doctor:
 	@echo -n "  • Node.js:      " && (which node >/dev/null 2>&1 && node --version) || echo -e "$(RED)NOT FOUND$(RESET)"
 	@echo -n "  • pnpm:         " && (which pnpm >/dev/null 2>&1 && pnpm --version) || echo -e "$(YELLOW)NOT FOUND (run 'make install-pnpm')$(RESET)"
 	@echo -e "\n$(BOLD)GCP Configuration:$(RESET)"
-	@echo -e "  • Project ID:   $(GREEN)$(if $(PROJECT_ID),$(PROJECT_ID),$(RED)NOT SET$(RESET))"
-	@echo -e "  • Region:       $(GREEN)$(REGION)$(RESET)"
-	@echo -e "  • Target Image: $(GREEN)$(IMAGE_URL)$(RESET)\n"
+	@echo -e "  • Active Account: $(GREEN)$$(gcloud config get-value account 2>/dev/null)$(RESET)"
+	@echo -e "  • Project ID:     $(GREEN)$(if $(PROJECT_ID),$(PROJECT_ID),$(RED)NOT SET$(RESET))"
+	@echo -e "  • Region:         $(GREEN)$(REGION)$(RESET)"
+	@echo -e "  • Target Image:   $(GREEN)$(IMAGE_URL)$(RESET)\n"
 
 .PHONY: setup-gcp
 setup-gcp: check-project
@@ -155,7 +169,7 @@ tf-init:
 .PHONY: tf-plan
 tf-plan: check-project
 	@echo -e "$(CYAN)$(BOLD)Planning Terraform infrastructure for project $(PROJECT_ID)...$(RESET)"
-	terraform -chdir=$(TF_DIR) plan \
+	$(TF_AUTH) terraform -chdir=$(TF_DIR) plan \
 		-var="project_id=$(PROJECT_ID)" \
 		-var="region=$(REGION)" \
 		-var="service_name=$(SERVICE_NAME)" \
@@ -165,7 +179,7 @@ tf-plan: check-project
 .PHONY: tf-apply
 tf-apply: check-project
 	@echo -e "$(CYAN)$(BOLD)Applying Terraform infrastructure...$(RESET)"
-	terraform -chdir=$(TF_DIR) apply -auto-approve \
+	$(TF_AUTH) terraform -chdir=$(TF_DIR) apply -auto-approve \
 		-var="project_id=$(PROJECT_ID)" \
 		-var="region=$(REGION)" \
 		-var="service_name=$(SERVICE_NAME)" \
@@ -183,7 +197,7 @@ tf-destroy: check-project
 	@read -p "Are you sure you want to proceed? [y/N] " ans && [ "$${ans:-N}" = "y" ] || [ "$${ans:-N}" = "Y" ]
 	@echo -e "$(YELLOW)Purging container images from Artifact Registry (if any) to allow repository cleanup...$(RESET)"
 	-gcloud artifacts docker images list "$(REGISTRY_HOST)/$(PROJECT_ID)/$(REPO_NAME)" --format="value(package)" 2>/dev/null | xargs -r -I {} gcloud artifacts packages delete {} --repository=$(REPO_NAME) --location=$(REGION) --project=$(PROJECT_ID) --quiet 2>/dev/null || true
-	terraform -chdir=$(TF_DIR) destroy -auto-approve \
+	$(TF_AUTH) terraform -chdir=$(TF_DIR) destroy -auto-approve \
 		-var="project_id=$(PROJECT_ID)" \
 		-var="region=$(REGION)" \
 		-var="service_name=$(SERVICE_NAME)" \
