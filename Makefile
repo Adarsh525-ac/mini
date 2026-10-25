@@ -36,11 +36,13 @@ TF_AUTH = GOOGLE_OAUTH_ACCESS_TOKEN=$$(gcloud auth print-access-token 2>/dev/nul
 .PHONY: check-auth
 check-auth:
 	@CURRENT_ACC=$$(gcloud config get-value account 2>/dev/null); \
-	if [ -z "$$CURRENT_ACC" ] || [ "$$CURRENT_ACC" = "(unset)" ]; then \
-		DETECTED_ACC=$$(gcloud auth list --format="value(account)" 2>/dev/null | head -n 1); \
+	if [ -z "$$CURRENT_ACC" ] || [ "$$CURRENT_ACC" = "(unset)" ] || [ "$$CURRENT_ACC" = "YOUR_GOOGLE_EMAIL" ] || [ "$$CURRENT_ACC" = "ACCOUNT" ]; then \
+		DETECTED_ACC=$$(gcloud auth list --format="value(account)" 2>/dev/null | grep -E "@" | grep -v "YOUR_GOOGLE_EMAIL" | head -n 1); \
 		if [ -n "$$DETECTED_ACC" ]; then \
-			echo -e "$(CYAN)Automatically activating Cloud Shell session account: $$DETECTED_ACC$(RESET)"; \
+			echo -e "$(CYAN)Automatically activating real Cloud Shell account: $$DETECTED_ACC$(RESET)"; \
 			gcloud config set account "$$DETECTED_ACC" --quiet 2>/dev/null; \
+		else \
+			gcloud config unset account --quiet 2>/dev/null; \
 		fi; \
 	fi
 
