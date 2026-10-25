@@ -1,0 +1,11 @@
+{
+  "name": "cloudtune-user-service",
+  "version": "1.0.0",
+  "description": "User Microservice for CloudTune - Isolated User, Likes, and History Storage",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  }
+}

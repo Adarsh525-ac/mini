@@ -1,0 +1,136 @@
+version: '3.8'
+
+services:
+  # ==============================================================
+  # API Gateway (Port 5000) - Edge Router, Rate Limiter & Health Aggregator
+  # ==============================================================
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: services/api-gateway/Dockerfile
+    container_name: cloudtune-api-gateway
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - CATALOG_SERVICE_URL=http://catalog-service:5001
+      - PLAYLIST_SERVICE_URL=http://playlist-service:5002
+      - USER_SERVICE_URL=http://user-service:5003
+      - ADMIN_SERVICE_URL=http://admin-service:5004
+    depends_on:
+      - catalog-service
+      - playlist-service
+      - user-service
+      - admin-service
+    networks:
+      - cloudtune-mesh
+
+  # ==============================================================
+  # Catalog Microservice (Port 5001) - Isolated Songs/Artists DB
+  # ==============================================================
+  catalog-service:
+    build:
+      context: ./backend
+      dockerfile: services/catalog-service/Dockerfile
+    container_name: cloudtune-catalog-service
+    restart: always
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - NODE_ENV=production
+      - CATALOG_DB_PATH=/usr/src/app/services/catalog-service/data/catalog.db.json
+    volumes:
+      - catalog_db_data:/usr/src/app/services/catalog-service/data
+    networks:
+      - cloudtune-mesh
+
+  # ==============================================================
+  # Playlist Microservice (Port 5002) - Isolated Playlists DB
+  # ==============================================================
+  playlist-service:
+    build:
+      context: ./backend
+      dockerfile: services/playlist-service/Dockerfile
+    container_name: cloudtune-playlist-service
+    restart: always
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - NODE_ENV=production
+      - PLAYLIST_DB_PATH=/usr/src/app/services/playlist-service/data/playlists.db.json
+      - CATALOG_SERVICE_URL=http://catalog-service:5001
+    volumes:
+      - playlist_db_data:/usr/src/app/services/playlist-service/data
+    depends_on:
+      - catalog-service
+    networks:
+      - cloudtune-mesh
+
+  # ==============================================================
+  # User Microservice (Port 5003) - Isolated Users/Likes/History DB
+  # ==============================================================
+  user-service:
+    build:
+      context: ./backend
+      dockerfile: services/user-service/Dockerfile
+    container_name: cloudtune-user-service
+    restart: always
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
+      - NODE_ENV=production
+      - USER_DB_PATH=/usr/src/app/services/user-service/data/users.db.json
+      - CATALOG_SERVICE_URL=http://catalog-service:5001
+    volumes:
+      - user_db_data:/usr/src/app/services/user-service/data
+    depends_on:
+      - catalog-service
+    networks:
+      - cloudtune-mesh
+
+  # ==============================================================
+  # Admin Microservice (Port 5004) - Isolated Audit Logs DB
+  # ==============================================================
+  admin-service:
+    build:
+      context: ./backend
+      dockerfile: services/admin-service/Dockerfile
+    container_name: cloudtune-admin-service
+    restart: always
+    ports:
+      - "5004:5004"
+    environment:
+      - PORT=5004
+      - NODE_ENV=production
+      - ADMIN_DB_PATH=/usr/src/app/services/admin-service/data/admin.db.json
+      - CATALOG_SERVICE_URL=http://catalog-service:5001
+      - USER_SERVICE_URL=http://user-service:5003
+    volumes:
+      - admin_db_data:/usr/src/app/services/admin-service/data
+    depends_on:
+      - catalog-service
+      - user-service
+    networks:
+      - cloudtune-mesh
+
+# ==============================================================
+# Isolated Database Storage Volumes (Database-per-Service)
+# ==============================================================
+volumes:
+  catalog_db_data:
+    driver: local
+  playlist_db_data:
+    driver: local
+  user_db_data:
+    driver: local
+  admin_db_data:
+    driver: local
+
+networks:
+  cloudtune-mesh:
+    driver: bridge

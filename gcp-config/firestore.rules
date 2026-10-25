@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function: Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function: Check if current user is owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function: Check if user has administrator role
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        request.auth.token.email == 'admin@cloudtune.io' ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+      );
+    }
+
+    // Users Collection: Users can read and update their own profile; cannot self-assign admin role
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'user');
+      allow update: if isOwner(userId) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
+      allow write: if isAdmin();
+    }
+
+    // Songs Collection: Public read for streaming; Write/Update/Delete restricted strictly to Admins
+    match /songs/{songId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Artists Collection: Public read; Write restricted to Admins
+    match /artists/{artistId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Albums Collection: Public read; Write restricted to Admins
+    match /albums/{albumId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Playlists Collection: Owner can create, edit, delete personal playlists; Admins can manage
+    match /playlists/{playlistId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if isAuthenticated() && (resource.data.ownerUid == request.auth.uid || isAdmin());
+    }
+
+    // Likes Collection: User can manage only their own likes
+    match /likes/{likeId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.resource.data.userUid == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userUid == request.auth.uid;
+    }
+
+    // Listening History Collection: Users write their playback events and read their own history
+    match /listeningHistory/{historyId} {
+      allow read: if isAuthenticated() && resource.data.userUid == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userUid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+  }
+}

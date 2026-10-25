@@ -1,0 +1,11 @@
+{
+  "name": "cloudtune-admin-service",
+  "version": "1.0.0",
+  "description": "Admin Microservice for CloudTune - Isolated Audit Logs, Uploads, and Diagnostics",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  }
+}

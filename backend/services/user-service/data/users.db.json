@@ -1,0 +1,60 @@
+{
+  "users": [
+    {
+      "id": "admin-123",
+      "uid": "admin-123",
+      "email": "admin@cloudtune.io",
+      "displayName": "Administrator",
+      "role": "admin",
+      "createdAt": "2026-10-15T14:20:24.836Z"
+    },
+    {
+      "id": "test-listener-123",
+      "uid": "test-listener-123",
+      "email": "listener@cloudtune.io",
+      "displayName": "Test Student",
+      "photoURL": "https://api.dicebear.com/7.x/avataaars/svg?seed=listener@cloudtune.io",
+      "role": "user",
+      "createdAt": "2026-10-15T14:20:24.978Z"
+    }
+  ],
+  "likes": [
+    {
+      "id": "test-listener-123_song-1",
+      "userUid": "test-listener-123",
+      "songId": "song-1",
+      "likedAt": "2026-10-15T14:20:24.988Z",
+      "createdAt": "2026-10-15T14:20:24.989Z"
+    },
+    {
+      "id": "ms-user-999_song-2",
+      "userUid": "ms-user-999",
+      "songId": "song-2",
+      "likedAt": "2026-10-15T14:21:30.535Z",
+      "createdAt": "2026-10-15T14:21:30.535Z"
+    }
+  ],
+  "history": [
+    {
+      "userUid": "test-listener-123",
+      "songId": "song-1",
+      "playedAt": "2026-10-15T14:20:24.996Z",
+      "id": "history-1792074024996-6mvue",
+      "createdAt": "2026-10-15T14:20:24.996Z"
+    },
+    {
+      "userUid": "test-listener-123",
+      "songId": "song-1",
+      "playedAt": "2026-10-15T14:21:36.064Z",
+      "id": "history-1792074096064-2jdt6",
+      "createdAt": "2026-10-15T14:21:36.064Z"
+    },
+    {
+      "userUid": "test-listener-123",
+      "songId": "song-1",
+      "playedAt": "2026-10-15T14:27:59.415Z",
+      "id": "history-1792074479415-x0m6i",
+      "createdAt": "2026-10-15T14:27:59.415Z"
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "songs": [
+    {
+      "id": "song-1",
+      "title": "SoundHelix Song 1",
+      "artistId": "artist-1",
+      "artistName": "SoundHelix Ensemble",
+      "albumId": "album-1",
+      "albumName": "Algorithmic Symphonies",
+      "genre": "Electronic",
+      "duration": 372,
+      "audioObjectPath": "audio/song-1.mp3",
+      "audioUrl": "/demo-audio/soundhelix-1.mp3",
+      "coverObjectPath": "covers/cover-1.jpg",
+      "coverUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80",
+      "createdAt": "2026-10-15T14:20:24.734Z"
+    },
+    {
+      "id": "song-2",
+      "title": "SoundHelix Song 2",
+      "artistId": "artist-1",
+      "artistName": "SoundHelix Ensemble",
+      "albumId": "album-1",
+      "albumName": "Algorithmic Symphonies",
+      "genre": "Ambient",
+      "duration": 423,
+      "audioObjectPath": "audio/song-2.mp3",
+      "audioUrl": "/demo-audio/soundhelix-2.mp3",
+      "coverObjectPath": "covers/cover-2.jpg",
+      "coverUrl": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&auto=format&fit=crop&q=80",
+      "createdAt": "2026-10-15T13:20:24.735Z"
+    },
+    {
+      "id": "song-3",
+      "title": "SoundHelix Song 3",
+      "artistId": "artist-2",
+      "artistName": "Digital Waves",
+      "albumId": "album-2",
+      "albumName": "Cloud Horizons",
+      "genre": "Electronic",
+      "duration": 334,
+      "audioObjectPath": "audio/song-3.mp3",
+      "audioUrl": "/demo-audio/soundhelix-3.mp3",
+      "coverObjectPath": "covers/cover-3.jpg",
+      "coverUrl": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80",
+      "createdAt": "2026-10-15T12:20:24.735Z"
+    },
+    {
+      "id": "song-4",
+      "title": "Neon Cyberpunk Echoes",
+      "artistId": "artist-3",
+      "artistName": "Synth Odyssey",
+      "albumId": "album-3",
+      "albumName": "Future Retro",
+      "genre": "Pop",
+      "duration": 250,
+      "audioObjectPath": "audio/song-1.mp3",
+      "audioUrl": "/demo-audio/soundhelix-1.mp3",
+      "coverObjectPath": "covers/cover-4.jpg",
+      "coverUrl": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&auto=format&fit=crop&q=80",
+      "createdAt": "2026-10-15T11:20:24.735Z"
+    },
+    {
+      "id": "song-5",
+      "title": "Chill Lofi Morning Coffee",
+      "artistId": "artist-4",
+      "artistName": "Lofi Beats Collective",
+      "albumId": "album-4",
+      "albumName": "Rainy Cafe Sessions",
+      "genre": "Lofi",
+      "duration": 215,
+      "audioObjectPath": "audio/song-2.mp3",
+      "audioUrl": "/demo-audio/soundhelix-2.mp3",
+      "coverObjectPath": "covers/cover-5.jpg",
+      "coverUrl": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=500&auto=format&fit=crop&q=80",
+      "createdAt": "2026-10-15T10:20:24.735Z"
+    },
+    {
+      "id": "song-6",
+      "title": "Midnight Drive Bassline",
+      "artistId": "artist-2",
+      "artistName": "Digital Waves",
+      "albumId": "album-2",
+      "albumName": "Cloud Horizons",
+      "genre": "Rock",
+      "duration": 290,
+      "audioObjectPath": "audio/song-3.mp3",
+      "audioUrl": "/demo-audio/soundhelix-3.mp3",
+      "coverObjectPath": "covers/cover-6.jpg",
+      "coverUrl": "https://images.unsplash.com/photo-1445985543470-41fba5c3144a?w=500&auto=format&fit=crop&q=80",
+      "createdAt": "2026-10-15T09:20:24.735Z"
+    }
+  ],
+  "artists": [
+    {
+      "id": "artist-1",
+      "name": "SoundHelix Ensemble",
+      "biography": "Generative music architects crafting harmonic algorithmic arrangements for streaming audio systems.",
+      "imageObjectPath": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "artist-2",
+      "name": "Digital Waves",
+      "biography": "Synthwave and electronic music producer exploring cloud computing and audio synthesis.",
+      "imageObjectPath": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "artist-3",
+      "name": "Synth Odyssey",
+      "biography": "Retrofuturistic synthpop duo fusing 80s analog synthesizers with modern cloud production.",
+      "imageObjectPath": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "artist-4",
+      "name": "Lofi Beats Collective",
+      "biography": "Relaxing study and focus music creators from Tokyo, Berlin, and San Francisco.",
+      "imageObjectPath": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=400&auto=format&fit=crop&q=80"
+    }
+  ],
+  "albums": [
+    {
+      "id": "album-1",
+      "title": "Algorithmic Symphonies",
+      "artistId": "artist-1",
+      "artistName": "SoundHelix Ensemble",
+      "coverObjectPath": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80",
+      "releaseYear": 2024
+    },
+    {
+      "id": "album-2",
+      "title": "Cloud Horizons",
+      "artistId": "artist-2",
+      "artistName": "Digital Waves",
+      "coverObjectPath": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80",
+      "releaseYear": 2024
+    },
+    {
+      "id": "album-3",
+      "title": "Future Retro",
+      "artistId": "artist-3",
+      "artistName": "Synth Odyssey",
+      "coverObjectPath": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&auto=format&fit=crop&q=80",
+      "releaseYear": 2023
+    },
+    {
+      "id": "album-4",
+      "title": "Rainy Cafe Sessions",
+      "artistId": "artist-4",
+      "artistName": "Lofi Beats Collective",
+      "coverObjectPath": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=500&auto=format&fit=crop&q=80",
+      "releaseYear": 2024
+    }
+  ]
+}

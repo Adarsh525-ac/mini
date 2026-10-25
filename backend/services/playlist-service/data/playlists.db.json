@@ -1,0 +1,50 @@
+{
+  "playlists": [
+    {
+      "name": "MCA Exam Playlist",
+      "ownerUid": "test-listener-123",
+      "ownerName": "Test Student",
+      "songIds": [],
+      "id": "playlists-1792074024984-ytp5t",
+      "createdAt": "2026-10-15T14:20:24.984Z"
+    },
+    {
+      "name": "Microservice Inter-Service Playlist",
+      "ownerUid": "ms-user-999",
+      "ownerName": "ms",
+      "songIds": [
+        "song-1"
+      ],
+      "id": "playlists-1792074090515-gmpkz",
+      "createdAt": "2026-10-15T14:21:30.515Z",
+      "updatedAt": "2026-10-15T14:21:30.524Z"
+    },
+    {
+      "name": "MCA Exam Playlist",
+      "ownerUid": "test-listener-123",
+      "ownerName": "Test Student",
+      "songIds": [],
+      "id": "playlists-1792074096054-t7sdw",
+      "createdAt": "2026-10-15T14:21:36.054Z"
+    },
+    {
+      "name": "MCA Exam Playlist",
+      "ownerUid": "test-listener-123",
+      "ownerName": "Test Student",
+      "songIds": [],
+      "id": "playlists-1792074479405-i218f",
+      "createdAt": "2026-10-15T14:27:59.405Z"
+    },
+    {
+      "name": "Microservice Inter-Service Playlist",
+      "ownerUid": "ms-user-999",
+      "ownerName": "ms",
+      "songIds": [
+        "song-1"
+      ],
+      "id": "playlists-1792074479932-batyz",
+      "createdAt": "2026-10-15T14:27:59.932Z",
+      "updatedAt": "2026-10-15T14:27:59.940Z"
+    }
+  ]
+}
