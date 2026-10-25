@@ -2,50 +2,90 @@
 
 **CloudTune** is a complete, cloud-native music streaming platform built for an **MCA Cloud Computing** academic project. It features a responsive Spotify-inspired dark UI, real HTML5 audio playback, personal playlists, likes, listening history, and a protected Administrator Console.
 
-The application is architected to run seamlessly **locally during development** and be deployable to **Google Cloud Platform (GCP)** leveraging **Cloud Run**, **Cloud Firestore**, **Cloud Storage**, and **Firebase Authentication**.
+The application is architected to run seamlessly **locally during development** and be deployable to **Google Cloud Platform (GCP)** leveraging **Cloud Run**, **Artifact Registry**, **Terraform**, **Cloud Firestore**, **Cloud Storage**, and **Firebase Authentication**.
 
 ---
 
-## 🚀 Quick Start (Run Locally in 2 Minutes)
+## 🚀 Quickstart in Google Cloud Shell & Terraform
 
-CloudTune includes a **Local Hybrid Mode** with bundled legally usable royalty-free demonstration tracks and seed metadata. You can test and demonstrate the entire application without needing any cloud credentials.
+Google Cloud Shell comes pre-configured with `gcloud`, `docker`, `terraform`, and `make`.
 
-### Prerequisites
-- Node.js (v18 or higher)
-- npm (v9 or higher)
-
-### Step 1: Start the Backend Microservices Mesh
-In a terminal:
+### Step 1: Open Cloud Shell & Clone Repository
+In [Google Cloud Shell](https://shell.cloud.google.com/):
 ```bash
-cd backend
-npm install
-npm run dev
+git clone https://github.com/Adarsh525-ac/mini.git finalrepo
+cd finalrepo
 ```
-Initializes the **CloudTune Microservices Mesh**:
-- **API Gateway**: `http://localhost:5000` (Reverse Proxy & Health Aggregation)
-- **Catalog Microservice**: `http://localhost:5001` (Isolated Catalog DB)
-- **Playlist Microservice**: `http://localhost:5002` (Isolated Playlist DB)
-- **User Microservice**: `http://localhost:5003` (Isolated User DB)
-- **Admin Microservice**: `http://localhost:5004` (Isolated Admin DB)
 
-Or run individual services: `npm run start:catalog`, `npm run start:playlist`, etc.
-Or using Docker Compose: `docker compose up --build`
-
-### Step 2: Start the Frontend Application
-In a second terminal:
+### Step 2: Set Your Active GCP Project
 ```bash
-cd frontend
-npm install
-npm run dev
+gcloud config set project <YOUR_GCP_PROJECT_ID>
 ```
-Open **http://localhost:5173** in your web browser.
 
-### Step 3: Run Automated Verification Tests
-In a terminal:
+### Step 3: Run Environment Setup & Diagnostics
 ```bash
-cd backend
-npm run test:microservices  # Validates microservices health, database isolation & inter-service calls (29 tests)
-npm test                   # Validates end-to-end integration flows through API Gateway (24 tests)
+make doctor
+make setup-gcp
+```
+
+### Step 4: Run the Application
+
+#### Option A: 1-Step Deploy to Google Cloud Run
+Provisions all cloud infrastructure, builds container with Google Cloud Build, and deploys to Cloud Run:
+```bash
+make deploy
+```
+Once completed, it will print the live HTTPS service URL.
+
+#### Option B: Run Locally in Cloud Shell (Web Preview)
+To test and preview the app right inside Cloud Shell:
+```bash
+make dev
+```
+Then click the **Web Preview** icon at the top right of Cloud Shell and select **Preview on port 3000**.
+
+---
+
+## 🛠️ Makefile Commands Reference
+
+| Command | Category | Description |
+|---|---|---|
+| `make help` | Help | Displays colored menu of all commands and active GCP project info |
+| `make doctor` | Setup | Validates CLI tools (`gcloud`, `terraform`, `docker`, `node`, `pnpm`) and GCP project |
+| `make setup-gcp` | Setup | Enables required GCP APIs and configures Docker credential helper |
+| `make install-pnpm` | Setup | Enables corepack and installs `pnpm` if running directly |
+| `make dev` | Local Run | Starts Next.js development server on `0.0.0.0:3000` for Cloud Shell Web Preview |
+| `make docker-build` | Local Run | Builds the container image locally with Docker |
+| `make docker-run` | Local Run | Runs the built container locally on port 3000 |
+| `make tf-init` | Terraform | Initializes Terraform provider and modules |
+| `make tf-plan` | Terraform | Generates an execution plan for infrastructure changes |
+| `make tf-apply` | Terraform | Provisions Artifact Registry, Service Account, IAM, and Cloud Run |
+| `make tf-output` | Terraform | Displays Terraform outputs (URLs, emails, image paths) |
+| `make tf-destroy` | Terraform | Tears down all provisioned GCP resources to eliminate cloud charges |
+| `make build` | Deployment | Builds & pushes image to Artifact Registry using **Google Cloud Build** |
+| `make build-local` | Deployment | Builds image locally via Docker |
+| `make push` | Deployment | Pushes locally built Docker image to Artifact Registry |
+| `make deploy` | Deployment | **Full 1-step deploy**: runs `tf-apply` + `build` + `cloud run deploy` + prints URL |
+| `make url` | Operations | Displays the live HTTPS Cloud Run URL |
+| `make logs` | Operations | Streams live application logs from Cloud Run |
+| `make clean` | Cleanup | Cleans `.next`, build caches, and temporary files |
+
+---
+
+## 🏗️ Terraform Infrastructure Architecture
+
+All Terraform configurations are located under the [`terraform/`](./terraform/) directory:
+
+```
+terraform/
+├── versions.tf               # Terraform & Google Provider (>= 5.38, < 7.0)
+├── variables.tf              # Configurable variables (region, CPU, memory, scaling)
+├── services.tf               # Google Project Services & API enablement
+├── artifact_registry.tf      # Artifact Registry Docker repository (finalrepo)
+├── iam.tf                    # Cloud Run service account & public invoker IAM bindings
+├── cloud_run.tf              # Cloud Run v2 service definition & health checks
+├── outputs.tf                # Outputs: live URL, repository URL, target image
+└── terraform.tfvars.example  # Example variable definitions
 ```
 
 ---
@@ -63,7 +103,7 @@ npm test                   # Validates end-to-end integration flows through API 
 - **Authentication**: Email/Password registration, Login, and Google Sign-In via Firebase Auth.
 - **Personal Playlists**: Create, rename, delete personal playlists, and add/remove tracks.
 - **Liked Songs**: Dedicated purple-gradient collection page with toggle heart actions.
-- **Listening History**: Automatically logs played tracks to Firestore `listeningHistory`.
+- **Listening History**: Automatically logs played tracks.
 - **User Profile**: Displays user details, profile avatar, and GCP cloud architecture specifications.
 
 ### 3. Protected Administrator Console (`/admin`)
@@ -74,18 +114,20 @@ npm test                   # Validates end-to-end integration flows through API 
 
 ---
 
-## ☁️ Google Cloud Platform Microservices Architecture
+## 📂 Project Structure
 
-```
-Web Browser (React 18 + Vite SPA on Firebase Hosting)
-       │
-       ▼ HTTPS REST API (Port 5000 / Cloud Run)
-CloudTune API Gateway (Edge Routing, Rate Limiting & Health Aggregator)
-       ├── Catalog Microservice (:5001) <──> Catalog DB (Isolated)
-       │       └── Google Cloud Storage (Audio Objects & Cover Art)
-       ├── Playlist Microservice (:5002) <──> Playlist DB (Isolated)
-       ├── User Microservice (:5003) <──> User DB (Isolated)
-       └── Admin Microservice (:5004) <──> Admin DB (Isolated)
+### Customizing Configuration
+Copy `terraform/terraform.tfvars.example` to `terraform/terraform.tfvars`:
+```hcl
+project_id            = "my-gcp-project"
+region                = "us-central1"
+service_name          = "sonora-web"
+repository_id         = "finalrepo"
+cpu                   = "1"
+memory                = "512Mi"
+min_instances         = 0
+max_instances         = 5
+allow_unauthenticated = true
 ```
 
 For complete architectural diagrams and data flows, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -104,7 +146,7 @@ git clone https://github.com/Adarsh525-ac/mini.git cloudtune && cd cloudtune
 make help
 
 # 3. Check environment prerequisites and connect to your GCP project
-make check-env
+make check-env       # (or: make doctor)
 make config PROJECT_ID="<your-gcp-project-id>"
 
 # 4. Install backend and frontend dependencies
@@ -129,7 +171,7 @@ CloudTune includes declarative Terraform configuration in [`terraform/`](file://
 - **Artifact Registry Repository**: `cloudtune-repo` for container images
 - **Google Cloud Storage Bucket**: `cloudtune-media-<project-id>` with CORS streaming configuration
 - **Cloud Firestore Database**: Managed native document database
-- **IAM Service Account & Roles**: Least-privilege `cloudtune-runner` service account
+- **IAM Service Account & Roles**: Least-privilege `cloudtune-api-sa` service account
 - **Google Cloud Run Service**: Serverless microservices API with auto-scaling (0 to 5 instances)
 
 ### One-Command Provisioning:
@@ -192,46 +234,37 @@ make deploy-frontend
 cd frontend && npm run build && cd .. && npx firebase-tools deploy --only hosting
 ```
 
+---
 
 ## 📂 Project Repository Structure
 
 ```
 MINCLOUD/
-├── backend/                         # Express.js REST API & Cloud Run service
-│   ├── src/
-│   │   ├── config/                  # Firebase Admin & Cloud Storage configuration
-│   │   ├── controllers/             # Song, Playlist, User, and Admin handlers
-│   │   ├── middleware/              # Auth, Admin guards, and Error handlers
-│   │   ├── routes/                  # Express route definitions
-│   │   ├── utils/                   # Seed data and mock stores
-│   │   └── server.js                # Server entry point with health checks
-│   ├── tests/
-│   │   └── api.test.js              # 24 automated integration test cases
-│   ├── uploads/                     # Local media storage fallback
+├── Makefile                         # Cloud Shell automation & build lifecycle commands
+├── terraform/                       # Infrastructure as Code (GCP Cloud Run, GCS, Firestore)
+│   ├── versions.tf                  # Provider versions (~> 5.10)
+│   ├── variables.tf                 # Configurable variables
+│   ├── services.tf                  # Enabled Google Cloud APIs
+│   ├── artifact_registry.tf         # Docker Artifact Registry repo
+│   ├── storage.tf                   # Cloud Storage media bucket with CORS
+│   ├── firestore.tf                 # Native Firestore NoSQL database
+│   ├── iam.tf                       # Service account and least-privilege roles
+│   ├── cloud_run.tf                 # Cloud Run serverless container
+│   ├── outputs.tf                   # Deployed URLs and frontend .env snippets
+│   └── terraform.tfvars.example     # Variables template
+├── backend/                         # Express.js REST API & Cloud Run microservices mesh
+│   ├── src/                         # Unified server, routes, controllers
+│   ├── services/                    # 4 isolated microservices (catalog, playlist, user, admin)
+│   ├── shared/                      # Auth middleware and shared utilities
+│   ├── tests/                       # 53 automated integration tests
 │   ├── Dockerfile                   # Cloud Run container definition
 │   └── package.json
 ├── frontend/                        # React 18 + Vite frontend
-│   ├── public/                      # Static assets & legal demonstration audio
-│   ├── src/
-│   │   ├── components/              # Sidebar, Topbar, Player, SongCards, Modals
-│   │   ├── context/                 # AuthContext & PlayerContext (HTML5 Audio)
-│   │   ├── pages/                   # Home, Search, Library, Playlist, Admin, etc.
-│   │   ├── services/                # API client and Firebase initialization
-│   │   ├── App.jsx                  # React Router configuration
-│   │   └── index.css                # Tailwind CSS & Spotify design tokens
+│   ├── src/                         # Spotify Dark UI components, context, pages
+│   ├── index.css                    # Design system tokens
 │   └── vite.config.js
-├── gcp-config/                      # GCP deployment scripts & security rules
-│   ├── cors.json                    # Cloud Storage CORS specification
-│   ├── firestore.rules              # Firestore security rules
-│   ├── deploy-backend.sh            # Bash Cloud Run deployment script
-│   ├── deploy-backend.ps1           # PowerShell Cloud Run deployment script
-│   └── seed-firestore.js            # Firestore catalogue seeding script
+├── gcp-config/                      # Deployment scripts & security rules
 ├── docs/                            # MCA academic documentation
-│   ├── ARCHITECTURE.md              # Detailed GCP architecture & Mermaid diagram
-│   ├── API_DOCUMENTATION.md         # Full REST API specification
-│   ├── TESTING_CHECKLIST.md         # Manual & automated verification checklist
-│   ├── GCP_COST_ESTIMATION.md       # Student Free Tier & budget safety guide
-│   └── MCA_PROJECT_REPORT_GUIDE.md  # Viva Voce questions, answers, and report theory
 ├── firebase.json                    # Firebase Hosting & Firestore rules configuration
 └── README.md
 ```

@@ -12,46 +12,56 @@ output "region" {
   value       = var.region
 }
 
-output "artifact_registry_repo" {
-  description = "The full Artifact Registry Docker image prefix."
-  value       = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.repo.name}"
+output "service_name" {
+  description = "Name of the deployed Cloud Run service."
+  value       = google_cloud_run_v2_service.app.name
+}
+
+output "service_url" {
+  description = "Public HTTPS URL of the Cloud Run service."
+  value       = google_cloud_run_v2_service.app.uri
+}
+
+output "health_check_url" {
+  description = "Aggregated health check endpoint URL."
+  value       = "${google_cloud_run_v2_service.app.uri}/api/health"
+}
+
+output "repository_name" {
+  description = "Name of the Artifact Registry Docker repository."
+  value       = google_artifact_registry_repository.app_repo.repository_id
+}
+
+output "repository_url" {
+  description = "Full URL prefix for container images in Artifact Registry."
+  value       = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.app_repo.repository_id}"
+}
+
+output "service_account_email" {
+  description = "Runtime service account email used by Cloud Run."
+  value       = google_service_account.cloud_run_sa.email
 }
 
 output "storage_bucket_name" {
-  description = "Cloud Storage bucket name for audio tracks and covers."
+  description = "Google Cloud Storage bucket name for audio tracks and artwork."
   value       = google_storage_bucket.media_bucket.name
 }
 
 output "storage_bucket_url" {
-  description = "Cloud Storage bucket gs:// URI."
+  description = "Google Cloud Storage bucket gs:// URI."
   value       = "gs://${google_storage_bucket.media_bucket.name}"
 }
 
 output "firestore_database_name" {
-  description = "The Firestore database name."
+  description = "Name of the Firestore database."
   value       = var.create_firestore_database ? google_firestore_database.database[0].name : "(default - external)"
-}
-
-output "service_account_email" {
-  description = "Cloud Run runtime service account email."
-  value       = google_service_account.cloudtune_sa.email
-}
-
-output "backend_service_url" {
-  description = "Public HTTPS URL for CloudTune Backend on Cloud Run."
-  value       = var.deploy_cloud_run ? google_cloud_run_v2_service.backend[0].uri : "Not deployed"
-}
-
-output "backend_health_check_url" {
-  description = "Aggregated microservices health check endpoint URL."
-  value       = var.deploy_cloud_run ? "${google_cloud_run_v2_service.backend[0].uri}/api/health" : "Not deployed"
 }
 
 output "frontend_env_snippet" {
   description = "Ready-to-copy snippet for frontend/.env configuration."
   value       = <<-EOT
     # Add to frontend/.env:
-    VITE_API_URL=${var.deploy_cloud_run ? "${google_cloud_run_v2_service.backend[0].uri}/api" : "https://YOUR_BACKEND_URL/api"}
+    VITE_API_URL=${google_cloud_run_v2_service.app.uri}/api
     VITE_FIREBASE_PROJECT_ID=${var.project_id}
     VITE_FIREBASE_STORAGE_BUCKET=${google_storage_bucket.media_bucket.name}
   EOT

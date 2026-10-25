@@ -10,28 +10,25 @@ project_id = "your-gcp-project-id"
 # Primary Google Cloud deployment region
 region = "us-central1"
 
-# Firestore database location (defaults to match region, or 'nam5' for US multi-region)
-firestore_location_id = "us-central1"
-
-# Artifact Registry Docker repository name
-artifact_repository_id = "cloudtune-repo"
-
-# Google Cloud Storage bucket name for audio and cover art
-# If commented or empty, defaults automatically to "cloudtune-media-<project_id>"
-# bucket_name = "cloudtune-media-your-gcp-project-id"
+# Service and repository names
+service_name  = "cloudtune-api"
+repository_id = "cloudtune-repo"
+image_tag     = "latest"
 
 # Cloud Run deployment settings
-backend_service_name = "cloudtune-api"
-min_instances        = 0
-max_instances        = 5
-cpu_limit            = "1"
-memory_limit         = "512Mi"
+container_port        = 8080
+min_instances         = 0
+max_instances         = 5
+cpu                   = "1"
+memory                = "512Mi"
+allow_unauthenticated = true
+deploy_placeholder    = true
+deletion_protection   = false
 
-# Set to false if Firestore was already initialized via Firebase Console
+# Cloud Storage bucket for music & artwork (defaults to "cloudtune-media-<project_id>")
+# bucket_name = "cloudtune-media-your-gcp-project-id"
+bucket_force_destroy = false
+
+# Firestore database (set to false if already created via Firebase Console)
 create_firestore_database = true
-
-# Bootstrap image: allows first-time Terraform apply before container image build
-use_bootstrap_image = true
-
-# Set this to your production Firebase Hosting or frontend domain when ready
-# frontend_url = "https://your-firebase-app.web.app"
+firestore_location_id     = "us-central1"
