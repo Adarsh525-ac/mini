@@ -1,0 +1,37 @@
+# ==============================================================================
+# Terraform Variables Example
+# Copy this file to `terraform.tfvars` and customize your settings
+# ==============================================================================
+
+# Your Google Cloud Project ID (Required)
+project_id = "your-gcp-project-id"
+
+# The Google Cloud region for deployment
+region = "us-central1"
+
+# The Cloud Run service name
+service_name = "sonora-web"
+
+# Artifact Registry repository ID
+repository_id = "sonora-repo"
+
+# Tag for the container image
+image_tag = "latest"
+
+# Container resource limits
+container_port = 3000
+cpu            = "1"
+memory         = "512Mi"
+
+# Autoscaling configuration (min_instances = 0 enables scale-to-zero)
+min_instances = 0
+max_instances = 5
+
+# Public unauthenticated web access
+allow_unauthenticated = true
+
+# Allow terraform destroy to remove the service cleanly (set true for production protection)
+deletion_protection = false
+
+# Optional backend API base URL (leave empty for built-in demo mode)
+# api_base_url = "https://api.example.com"
